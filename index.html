@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMFS Surgical Portfolio & Resident Logbook</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-dark: #131c2e;
+            --teal-medical: #0d9488;
+            --teal-hover: #115e59;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #1e293b;
+            --accent-red: #f43f5e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Responsive Mobile Layout */
+        nav {
+            width: 280px;
+            background-color: var(--card-dark);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .profile-box h2 {
+            font-size: 1.3rem;
+            color: var(--teal-medical);
+            margin-bottom: 0.25rem;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .nav-links li a {
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem;
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links li a:hover, .nav-links li a.active {
+            background-color: var(--teal-medical);
+            color: white;
+        }
+
+        main {
+            margin-left: 280px;
+            flex-grow: 1;
+            padding: 3rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        h3 {
+            color: var(--teal-medical);
+            margin: 1.75rem 0 0.75rem 0;
+            font-size: 1.2rem;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 0.25rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea, select {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.85rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--teal-medical);
+        }
+
+        button {
+            background-color: var(--teal-medical);
+            color: white;
+            padding: 0.9rem 1.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--teal-hover);
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .calc-result {
+            margin-top: 1.25rem;
+            padding: 1.25rem;
+            background-color: var(--bg-dark);
+            border-left: 4px solid var(--teal-medical);
+            border-radius: 0.375rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            background-color: var(--bg-dark);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .checklist-item input {
+            width: auto;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 992px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; padding: 1.5rem; border-right: none; border-bottom: 1px solid var(--border-color); }
+            main { margin-left: 0; padding: 1.5rem; }
+            .tool-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav>
+        <div class="profile-box">
+            <h2>OMFS PORTFOLIO</h2>
+            <p>Clinical Logbook & Ward Portal</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" onclick="switchPage('cases')">Surgical Case Feed</a></li>
+            <li><a href="#" onclick="switchPage('logger')">Add Surgical Record</a></li>
+            <li><a href="#" onclick="switchPage('ward')">Inpatient & Ward Tools</a></li>
+            <li><a href="#" onclick="switchPage('opd')">OPD & Academic Log</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Dynamic Content Canvas -->
+    <main>
+        <!-- PAGE 1: SURGICAL CASE FEED -->
+        <section id="cases" class="page-section active">
+            <h1>Surgical Case Feed</h1>
+            
+            <!-- Hardcoded Panfacial Trauma Case Study -->
+            <div class="card" style="border-top: 4px solid var(--teal-medical);">
+                <span style="background-color: var(--teal-medical); padding: 0.25rem 0.6rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold; letter-spacing: 0.5px;">HERO CASE STUDY</span>
+                <h2 style="margin-top: 0.75rem; font-size: 1.6rem; color: var(--text-main);">Panfacial Trauma Reconstruction</h2>
+                <p style="font-style: italic; color: var(--teal-medical); font-weight: 600; margin-bottom: 1.5rem;">
+                    Management of Bilateral ZMC Fractures Concomitant with Bilateral Subcondylar and Right Parasymphysis Fractures
+                </p>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+
+                <h3>1. Emergency Presentation & Clinical Assessment</h3>
+                <p><strong>History of Present Illness (HPI):</strong> A 24-year-old male patient presented to the emergency trauma bay following an alleged high-velocity Road Traffic Accident (RTA). The patient was traveling on a motorcycle when he collided with an oncoming two-wheeler, resulting in a direct, high-impact deceleration fall face-first onto the ground. A transient loss of consciousness (LOC) of approximately 15 minutes was noted immediately post-impact. Medico-Legal Case (MLC) protocols were activated upon admission.</p>
+                <p><strong>Clinical Examination (On Examination):</strong> Gross facial asymmetry characterized by distinct structural flattening of the left malar profile. Severe soft-tissue edema and tracking ecchymosis localized across the upper lip vestibule, accompanied by prominent left periorbital edema and subconjunctival hemorrhage. Step-deformities were acutely palpated along the left supraorbital ridge margin and the bilateral infraorbital rims. Maxillary skeletal mobility was elicited under manual digital pressure. Intraoral assessment revealed severe trismus and an acutely deranged, unstable dental occlusion featuring premature posterior open contacts and an anterior open bite profile.</p>
+
+                <!-- 3D CT Rendering Container -->
+                <div style="width: 100%; margin: 1.5rem 0; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; background-color: #000;">
+                    <img src="ct_scan.jpg" alt="Pre-operative 3D CT Reconstruction Matrix" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none';">
+                    <p style="padding: 0.75rem; font-size: 0.85rem; color: var(--text-muted); background-color: #0f172a; margin: 0; text-align: center; border-top: 1px solid var(--border-color);">
+                        <strong>Figure 1:</strong> Pre-operative maxillofacial Computed Tomography (NCCT) dataset showing multi-planar skeletal collapse across Trapnell's and Campbell's lines. (Upload 'ct_scan.jpg' to your repository to display).
+                    </p>
+                </div>
+
+                <h3>2. Pre-Operative Stabilization & Resident Protocols</h3>
+                <p><strong>Airway Security & Monitoring:</strong> Due to the loss of anterior mandibular support driven by the bilateral subcondylar skeletal fractures, the patient was at high risk for mechanical airway compromise from posterior tongue relapse. Continuous bedside oxygen saturation tracking was mandated, and an emergency tongue-stitch instrument kit alongside a tracheostomy tray was secured directly at the head of the bed.</p>
+                <p><strong>Temporary Maxillomandibular Fixation (MMF):</strong> Under local infiltration anesthesia (2% Lignocaine Hydrochloride with 1:200,000 Adrenaline), maxillary and mandibular Erich arch bars were adapted and wired. Passive intermaxillary traction was engaged to re-establish a temporary, gross occlusal baseline, neutralize agonizing muscular spasms, and control active intraosseous microvascular bleeding at the mobile right parasymphysis fracture margins.</p>
+
+                <h3>3. Surgical Sequencing & Hardware Execution</h3>
+                <p><strong>Sequencing Philosophy:</strong> To systematically reconstruct the three-dimensional facial dimensions safely, a strict <strong>"Bottom-Up and Outside-In"</strong> surgical sequence was planned under General Anesthesia (GA), utilizing armored nasotracheal intubation to preserve unhindered access to the dental arches.</p>
+                <ul>
+                    <li><strong>Step 1: Foundational Occlusal Lock</strong> - The displaced mandibular segments were manually reduced into maximum intercuspation and temporarily locked into rigid MMF using wire loops around the pre-placed Erich arch bars.</li>
+                    <li><strong>Step 2: Mandibular Base Reconstruction</strong> - Approached via a lower anterior mandibular vestibular incision spanning from 35 to 44, with careful subperiosteal isolation of the right mental nerve. Fixation was executed along Champy's lines using a 2.5mm straight 6-hole plate with 8mm bicortical screws at the inferior border, and a secondary 2.0mm straight 6-hole plate with gap at the subapical tension zone.</li>
+                    <li><strong>Step 3: Restoring Posterior Vertical Ramus Height</strong> - Accessed via a left preauricular incision. Layer-wise dissection exposed the TMJ capsule and condylar process. The low subcondylar fracture was anatomically reduced and fixed using a 2.0mm 4-hole c̅ gap miniplate to lock the vertical ramus projection, followed by a controlled release of the intraoperative wire MMF.</li>
+                    <li><strong>Step 4: Midface Framework Realignment</strong> - Upper midface frames were approached via bilateral upper maxillary vestibular incisions (13-15 and 23-26 zones) and open reduction through the existing left supraorbital laceration. Plating infrastructure used: Left FZ (1.5mm 4-hole c̅ gap plate), Left Maxillary buttress (2.0mm 6-hole c̅ gap L-shape plate), Nasomaxillary buttress (2.0mm 4-hole c̅ gap straight plate), and Right Zygomatic buttress (2.0mm 4-hole c̅ gap straight plate).</li>
+                </ul>
+
+                <!-- Intraop Arch Bar Container -->
+                <div style="max-width: 600px; margin: 1.5rem auto; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; background-color: var(--bg-dark);">
+                    <img src="arch_bar.jpg" alt="Intraoperative Erich Arch Bar and Elastic Fixation" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none';">
+                    <p style="padding: 0.75rem; font-size: 0.85rem; color: var(--text-muted); background-color: #0f172a; margin: 0; text-align: center; border-top: 1px solid var(--border-color);">
+                        <strong>Figure 2:</strong> Intraoral layer closure using interrupted 3-0 Vicryl sutures alongside multi-vector orange latex training elastics. (Upload 'arch_bar.jpg' to display).
+                    </p>
+                </div>
+
+                <h3>4. Postoperative Intensive Care & Ward Routine</h3>
+                <p>Following uneventful extubation, the patient was transitioned to the OT-ICU and managed with a 30° propped-up head elevation and neutral positioning to minimize midfacial interstitial lymphedema. Fluid lines consisted of alternating 1L NS and 1L RL run slowly over 4 hours. Pharmacotherapy profile included: Inj. Augmentin 1.2g IV BD, Inj. Metrogyl 100cc IV TDS, Inj. Dexona 8mg IV TDS (anti-edema), Inj. Dynapar 75mg IV BD, Inj. Emset 4mg IV TDS, Inj. Pantocid 40mg IV OD, Inj. Neurobion Forte IV BD, and Inj. Levepsy 500mg IV BD (post-traumatic seizure prophylaxis secondary to history of LOC).</p>
+
+                <h3>5. Academic Treatment Planning References</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; font-style: italic;">
+                    1. Gruss, J. S., & Mackinnon, S. E. (1986). Complex maxillary fractures: the critical role of rigid internal fixation and sequence planning. Plastic and Reconstructive Surgery, 77(1), 9-22.<br>
+                    2. Champy, M., Lodde, J. P., Schmitt, R., et al. (1978). Mandibular osteosynthesis by miniature screwed plates via an intraoral approach. Journal of Maxillofacial Surgery, 6, 14-21.<br>
+                    3. Schneider, M., Erasmus, F., & Eckelt, U. (2008). Open versus closed treatment of fractures of the mandibular condylar process. Journal of Cranio-Maxillofacial Surgery, 36(5), 252-261.
+                </p>
+            </div>
+
+            <!-- Dynamic Target Container for New Logged Cases -->
+            <div id="dynamic-cases-target"></div>
+        </section>
+
+        <!-- PAGE 2: INTERACTIVE CASE LOGGER -->
+        <section id="logger" class="page-section">
+            <h1>Add a Surgical Case Record</h1>
+            <p style="margin-bottom: 1.5rem;">Post and compile case files locally to build your digital clinical portfolio archive.</p>
+            <div class="card">
+                <form id="caseForm" onsubmit="saveNewCase(event)">
+                    <div>
+                        <label>Clinical Diagnosis / Title</label>
+                        <input type="text" id="caseTitle" placeholder="e.g., Odontogenic Keratocyst (OKC) of Mandible" required>
+                    </div>
+                    <div>
+                        <label>Category Tag</label>
+                        <select id="caseCategory">
+                            <option value="Trauma Reconstruction">Trauma Reconstruction</option>
+                            <option value="Cyst / Tumor Pathology">Cyst / Tumor Pathology</option>
+                            <option value="Minor Oral Surgery">Minor Oral Surgery</option>
+                            <option value="Ward Log & Protocol">Ward Log & Protocol</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Patient Demographics & Presentation</label>
+                        <textarea id="caseClinical" rows="3" placeholder="Age, gender, history of trauma/swelling, trismus, occlusal state..." required></textarea>
+                    </div>
+                    <div>
+                        <label>Surgical Approach & Hardware Specifications</label>
+                        <textarea id="caseSurgical" rows="4" placeholder="Incisions made, exposure, sequencing steps, specific plate trajectories and sizes used..." required></textarea>
+                    </div>
+                    <div>
+                        <label>Case Image (Direct URL Link)</label>
+                        <input type="text" id="caseImage" placeholder="e.g., https://hrushikesh1.github.io/OMFS-RESIDENCY/your_image.jpg">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">Upload the image to your GitHub repo first, then paste its direct hosting link here.</span>
+                    </div>
+                    <button type="submit">Compile Case to Feed</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- PAGE 3: INPATIENT & WARD TOOLS -->
+        <section id="ward" class="page-section">
+            <h1>Inpatient & Ward Tools</h1>
+            <div class="tool-grid">
+                <!-- Fluid Rate Engine -->
+                <div class="card">
+                    <h2>Holliday-Segar Fluid Calculator</h2>
+                    <p>Computes maintenance crystalloid requirements (4-2-1 rule) for NBM ward patients.</p>
+                    <div style="margin: 1.25rem 0;">
+                        <label>Patient Weight (kg)</label>
+                        <input type="number" id="patientWeight" placeholder="e.g., 65" oninput="calculateFluids()">
+                    </div>
+                    <div id="fluidResult" class="calc-result">
+                        Enter patient weight to process fluid volume metrics.
+                    </div>
+                </div>
+
+                <!-- Rounds Tracker Checklist -->
+                <div class="card">
+                    <h2>Post-Op Ward Rounds Tracker</h2>
+                    <p>Serial monitoring matrix for junior residents on duty.</p>
+                    <div style="margin-top: 1.25rem;">
+                        <div class="checklist-item"><input type="checkbox"> <label>Bedside wire-cutters securely taped to patient's chart (MMF Crisis Release)</label></div>
+                        <div class="checklist-item"><input type="checkbox"> <label>CN V2 (Infraorbital nerve maps) sensory tracking</label></div>
+                        <div class="checklist-item"><input type="checkbox"> <label>CN V3 (Mental nerve trajectory) numbness tracking</label></div>
+                        <div class="checklist-item"><input type="checkbox"> <label>CN VII (Temporal & Marginal Mandibular) motor facial symmetry check</label></div>
+                        <div class="checklist-item"><input type="checkbox"> <label>Occlusal Verification: Confirm elastic vectors hold stable maximum intercuspation</label></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 4: OPD & ACADEMIC LOG -->
+        <section id="opd" class="page-section">
+            <h1>OPD & Academic Log</h1>
+            <div class="card">
+                <h2>Peripheral Postings & Minor Surgery Logbook</h2>
+                <p>Ledger documenting daily operations across outpatient clinics and inter-departmental assignments.</p>
+                <div style="margin-top: 1.5rem; border-left: 3px solid var(--teal-medical); padding-left: 1rem;">
+                    <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.25rem;">Minor OT Log</h4>
+                    <p style="font-size: 0.95rem; margin: 0;">Complex facial laceration layer closures, structural suturing, space infection incision & drainage (I&D) grids, and transalveolar extractions of impacted mandibular third molars.</p>
+                </div>
+                <div style="margin-top: 1.5rem; border-left: 3px solid var(--teal-medical); padding-left: 1rem;">
+                    <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.25rem;">Cross-Departmental Referrals</h4>
+                    <p style="font-size: 0.95rem; margin: 0;">Co-managing panfacial injuries with Neurosurgery to monitor skull base fractures and tracking active cerebrospinal fluid (CSF) rhinorrhea or otorrhea.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Application Processing Engine -->
+    <script>
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            // Handle active styling across navigation items
+            const activeLink = Array.from(document.querySelectorAll('.nav-links a')).find(link => link.getAttribute('onclick').includes(pageId));
+            if(activeLink) activeLink.classList.add('active');
+        }
+
+        function calculateFluids() {
+            const weight = parseFloat(document.getElementById('patientWeight').value);
+            let hourlyRate = 0;
+            if (!weight || weight <= 0) {
+                document.getElementById('fluidResult').innerHTML = "Enter a valid weight profile.";
+                return;
+            }
+            if (weight <= 10) { hourlyRate = weight * 4; }
+            else if (weight <= 20) { hourlyRate = 40 + ((weight - 10) * 2); }
+            else { hourlyRate = 60 + ((weight - 20) * 1); }
+            
+            const dailyTotal = hourlyRate * 24;
+            document.getElementById('fluidResult').innerHTML = `
+                <strong>Hourly Infusion Velocity:</strong> ${hourlyRate} mL/hour<br>
+                <strong>24-Hour Maintenance Target:</strong> ${dailyTotal} mL / 24 hours<br>
+                <span style="font-size: 0.8rem; color: var(--text-muted); display:block; margin-top:0.5rem;">Recommended Crystalloids: Ringer's Lactate or Isotonic 0.9% Normal Saline. Adjust for blood/drain losses.</span>
+            `;
+        }
+
+        function saveNewCase(e) {
+            e.preventDefault();
+            const title = document.getElementById('caseTitle').value;
+            const category = document.getElementById('caseCategory').value;
+            const clinical = document.getElementById('caseClinical').value;
+            const surgical = document.getElementById('caseSurgical').value;
+            const image = document.getElementById('caseImage').value;
+
+            const newCase = { title, category, clinical, surgical, image, id: Date.now() };
+            let existingCases = JSON.parse(localStorage.getItem('omfsCases')) || [];
+            existingCases.unshift(newCase);
+            localStorage.setItem('omfsCases', JSON.stringify(existingCases));
+
+            document.getElementById('caseForm').reset();
+            loadCasesFromStorage();
+            switchPage('cases');
+        }
+
+        function loadCasesFromStorage() {
+            const cases = JSON.parse(localStorage.getItem('omfsCases')) || [];
+            const target = document.getElementById('dynamic-cases-target');
+            target.innerHTML = '';
+            cases.forEach(c => {
+                const imgTag = c.image ? `<div style="width: 100%; margin: 1.5rem 0; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden;"><img src="${c.image}" style="width: 100%; height: auto; display: block;"></div>` : '';
+                target.innerHTML += `
+                    <div class="card">
+                        <span style="background-color: var(--border-color); padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold;"># ${c.category}</span>
+                        <h2 style="margin-top:0.5rem; color: var(--text-main);">${c.title}</h2>
+                        ${imgTag}
+                        <h3>Case Demographics & Evaluation</h3>
+                        <p>${c.clinical}</p>
+                        <h3>Surgical Execution & Notes</h3>
+                        <p>${c.surgical}</p>
+                    </div>
+                `;
+            });
+        }
+        window.onload = loadCasesFromStorage;
+    </script>
+</body>
+</html>
