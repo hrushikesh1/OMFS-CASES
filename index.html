@@ -435,20 +435,22 @@
             const cases = JSON.parse(localStorage.getItem('omfsCases')) || [];
             const target = document.getElementById('dynamic-cases-target');
             target.innerHTML = '';
-            cases.forEach(c => {
-                const imgTag = c.image ? `<div style="width: 100%; margin: 1.5rem 0; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden;"><img src="${c.image}" style="width: 100%; height: auto; display: block;"></div>` : '';
-                target.innerHTML += `
-                    <div class="card">
-                        <span style="background-color: var(--border-color); padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold;"># ${c.category}</span>
-                        <h2 style="margin-top:0.5rem; color: var(--text-main);">${c.title}</h2>
-                        ${imgTag}
-                        <h3>Case Demographics & Evaluation</h3>
-                        <p>${c.clinical}</p>
-                        <h3>Surgical Execution & Notes</h3>
-                        <p>${c.surgical}</p>
-                    </div>
-                `;
-            });
+                    cases.forEach(c => {
+            // Trim function cleans up the pasted link to ensure the browser loads the photo instantly
+            const imgHtml = c.image && c.image.trim() !== "" ? `<div style="width: 100%; margin: 1.5rem 0; border: 1px solid var(--border-color); border-radius: 0.5rem; overflow: hidden; background-color: #000;"><img src="${c.image.trim()}" style="width: 100%; height: auto; display: block;"></div>` : '';
+            
+            target.innerHTML += `
+                <div class="card" style="border-top: 2px solid var(--teal-medical);">
+                    <span style="background-color: var(--border-color); padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: bold; color: var(--teal-medical);"># ${c.category}</span>
+                    <h2 style="margin-top:0.5rem; color: var(--text-main); font-size: 1.4rem;">${c.title}</h2>
+                    ${imgHtml}
+                    <h3 style="font-size: 1.1rem; margin-top: 1.25rem;">Case Demographics & Evaluation</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">${c.clinical}</p>
+                    <h3 style="font-size: 1.1rem; margin-top: 1.25rem;">Surgical Execution & Notes</h3>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">${c.surgical}</p>
+                </div>
+            `;
+        });
         }
         window.onload = loadCasesFromStorage;
     </script>
